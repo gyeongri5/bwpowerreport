@@ -51,9 +51,10 @@ export default function App() {
   async function runAnalysis(p) {
     setLoading(true)
     const regionCode = REGION_CODES[p.region] || REGION_CODES['서울']
+    const smpRegion = p.region === '제주' ? '제주' : '육지'
     const [radiation, smp] = await Promise.all([
       fetchSolarRadiation(regionCode, new Date().getFullYear() - 1),
-      fetchCurrentSMP(),
+      fetchCurrentSMP(smpRegion),
     ])
     setSmpInfo(smp)
     const result = analyzePlant(p, radiation, smp)
@@ -78,6 +79,36 @@ export default function App() {
     window.print()
   }
 
+  function handleDownloadCSV() {
+    if (!analysis) return
+
+    const headers = ['월', '실제 발전량(kWh)', '이론 발전량(kWh)', '성능비(PR %)', '손실 전력량(kWh)', '적용 SMP(원/kWh)', '손실 금액(원)']
+    const rows = analysis.monthlyResults.map(d => [
+      `${d.month}월`,
+      d.actual,
+      d.theoretical,
+      d.pr,
+      d.lossKwh,
+      d.smpApplied,
+      d.lossAmount
+    ])
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(e => e.join(','))
+    ].join('\n')
+
+    // 한글 깨짐 방지를 위한 BOM 추가
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', `${plant.name}_발전소_월별_분석_리포트.csv`)
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
+
   const gradeColor = analysis?.grade?.color || '#2563eb'
   const regionAvgPrArr = REGIONAL_AVG_PR[plant.region] || REGIONAL_AVG_PR['default']
   const annualRegionAvg = (regionAvgPrArr.reduce((a, b) => a + b, 0) / 12).toFixed(1)
@@ -93,11 +124,8 @@ export default function App() {
             <span style={{ fontSize: 11, padding: '3px 8px', background: 'var(--color-navy-light)', borderRadius: 6, color: '#93c5fd', fontWeight: 600 }}>BETA</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-            {smpInfo.source === 'live' && (
-              <span style={{ fontSize: 13, color: '#86efac', fontWeight: 500 }}>● 실시간 SMP {smpInfo.smp}원/kWh</span>
-            )}
-            {smpInfo.source === 'csv' && (
-              <span style={{ fontSize: 13, color: '#86efac', fontWeight: 500 }}>● SMP {smpInfo.smp}원/kWh ({smpInfo.period} 기준)</span>
+            {smpInfo.source !== 'mock' && (
+              <span style={{ fontSize: 13, color: '#86efac', fontWeight: 500 }}>● {smpInfo.regionType} SMP {smpInfo.smp}원/kWh ({smpInfo.period} 기준)</span>
             )}
             {smpInfo.source === 'mock' && (
               <span style={{ fontSize: 13, color: '#fbbf24', fontWeight: 500 }}>◎ SMP {smpInfo.smp}원/kWh (기준값)</span>
@@ -291,7 +319,10 @@ export default function App() {
                       <Tooltip 
                         cursor={{ fill: 'var(--color-danger-light)' }}
                         contentStyle={{ borderRadius: 8, border: 'none', boxShadow: 'var(--shadow-md)' }}
-                        formatter={(v) => [`${v}만원`, '손실액']} 
+                        formatter={(v, name, props) => {
+                          if (name === '손실액') return [`${v}만원`, `손실액 (적용단가: ${props.payload.smpApplied}원)`]
+                          return [v, name]
+                        }} 
                       />
                       <Bar dataKey="손실액" fill="#f87171" radius={[4,4,0,0]} />
                     </BarChart>
@@ -405,8 +436,11 @@ export default function App() {
                   </div>
                 </div>
 
-                <div className="no-print" style={{ display: 'flex', justifyContent: 'center' }}>
-                  <button className="btn-secondary" onClick={handlePrintPDF} style={{ padding: '10px 28px' }}>
+                <div className="no-print" style={{ display: 'flex', justifyContent: 'center', gap: '12px' }}>
+                  <button className="btn-secondary" onClick={handleDownloadCSV} style={{ padding: '10px 24px', background: '#f0fdf4', color: '#16a34a', borderColor: '#bbf7d0' }}>
+                    📊 엑셀(CSV) 다운로드
+                  </button>
+                  <button className="btn-secondary" onClick={handlePrintPDF} style={{ padding: '10px 24px' }}>
                     🖨️ 리포트 PDF 저장
                   </button>
                 </div>

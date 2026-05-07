@@ -112,18 +112,51 @@ const SMP_CSV_DATA = {
   '2026-03': 109.99,
 }
 
-export async function fetchCurrentSMP() {
-  // 가장 최근 월 데이터 자동 선택
-  const keys = Object.keys(SMP_CSV_DATA).sort()
-  const latestKey = keys[keys.length - 1]
-  const smp = SMP_CSV_DATA[latestKey]
+// 제주 전용 월별 가중평균 SMP (원/kWh) — 제주 계통한계가격은 육지와 다름
+const JEJU_SMP_CSV_DATA = {
+  '2024-01': 142.1,
+  '2024-02': 140.5,
+  '2024-03': 135.2,
+  '2024-04': 128.4,
+  '2024-05': 124.1,
+  '2024-06': 126.8,
+  '2024-07': 132.5,
+  '2024-08': 136.2,
+  '2024-09': 131.4,
+  '2024-10': 129.7,
+  '2024-11': 133.8,
+  '2024-12': 139.5,
+  '2025-01': 137.13,
+  '2025-02': 136.39,
+  '2025-03': 133.03,
+  '2025-04': 144.58,
+  '2025-05': 145.47,
+  '2025-06': 138.05,
+  '2025-07': 140.39,
+  '2025-08': 137.40,
+  '2025-09': 132.91,
+  '2025-10': 121.53,
+  '2025-11': 114.81,
+  '2025-12': 110.44,
+  '2026-01': 123.53,
+  '2026-02': 128.52,
+  '2026-03': 129.99,
+}
 
-  console.info(`[SMP] CSV 데이터 사용: ${latestKey} 기준 ${smp}원/kWh`)
+export async function fetchCurrentSMP(region = '육지') {
+  const dataMap = region === '제주' ? JEJU_SMP_CSV_DATA : SMP_CSV_DATA
+  // 가장 최근 월 데이터 자동 선택
+  const keys = Object.keys(dataMap).sort()
+  const latestKey = keys[keys.length - 1]
+  const smp = dataMap[latestKey]
+
+  console.info(`[SMP] CSV 데이터 사용: ${latestKey} 기준 ${smp}원/kWh (${region})`)
   return {
     smp,
     source: 'csv',
     period: latestKey,
-    allData: SMP_CSV_DATA,
+    allData: dataMap,
+    regionType: region
   }
 }
 
