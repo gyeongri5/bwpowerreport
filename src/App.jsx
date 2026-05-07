@@ -428,6 +428,10 @@ export default function App() {
                       ) : (
                         <>현재 손실액이 크지 않아 당장의 유상 점검보다는 모니터링을 권장합니다. 다만 손실액이 50만원을 초과할 경우 세척 투자가 유리합니다.</>
                       )}
+                      
+                      <div style={{ marginTop: 16, padding: '12px', background: 'rgba(255,255,255,0.6)', borderRadius: '8px', fontSize: 13, color: 'var(--color-gray-600)', border: '1px dashed #93c5fd' }}>
+                        <span style={{ color: '#0284c7', fontWeight: 700 }}>💡 노후화 보정 완료:</span> {analysis.age}년 경과에 따른 패널 자연 노후화(-{analysis.degradationApplied}%)는 정상적인 현상으로 간주하여 위 손실액 계산에서 이미 차감했습니다. 즉, 위 금액은 청소 및 점검을 통해 <strong>실제로 되찾을 수 있는 100% 순수 손실 금액</strong>입니다.
+                      </div>
                     </div>
                     {analysis.lossAmount >= 500000 && (
                       <button className="btn-primary no-print" style={{ width: '100%', justifyContent: 'center', padding: '12px', fontSize: 15 }}>
