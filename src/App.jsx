@@ -11,10 +11,10 @@ const MONTHS = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','
 
 // 데모용 기본 발전소 데이터
 const DEFAULT_PLANT = {
-  name: '광덕 태양광발전소',
-  region: '광주',
+  name: '오솔라 1호 발전소',
   capacityKw: 100,
-  installYear: 2019,
+  installYear: 2020,
+  region: '서울',
   monthlyOutput: [7200, 8100, 11500, 13200, 14100, 11800, 9800, 11200, 10500, 9800, 7600, 6500],
 }
 
@@ -311,7 +311,8 @@ export default function App() {
                   <ResponsiveContainer width="100%" height={280}>
                     <BarChart data={analysis.monthlyResults.map((d, i) => ({
                       name: MONTHS[i],
-                      손실액: parseFloat((d.lossAmount / 10000).toFixed(1))
+                      손실액: parseFloat((d.lossAmount / 10000).toFixed(1)),
+                      smpApplied: d.smpApplied
                     }))}>
                       <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-gray-100)" />
                       <XAxis dataKey="name" tick={{ fontSize: 12, fill: 'var(--color-gray-500)' }} axisLine={false} tickLine={false} />
