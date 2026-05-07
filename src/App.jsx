@@ -43,10 +43,13 @@ export default function App() {
   const [analysis, setAnalysis] = useState(null)
   const [smpInfo, setSmpInfo] = useState({ smp: 112.5, source: 'mock' })
   const [loading, setLoading] = useState(false)
-  const [activeTab, setActiveTab] = useState('dashboard')
   const [showForm, setShowForm] = useState(false)
+  const [activeTab, setActiveTab] = useState('dashboard')
+  const [isDragging, setIsDragging] = useState(false)
 
-  useEffect(() => { runAnalysis(plant) }, [])
+  useEffect(() => {
+    runAnalysis(DEFAULT_PLANT)
+  }, [])
 
   async function runAnalysis(p) {
     setLoading(true)
@@ -77,6 +80,34 @@ export default function App() {
 
   function handlePrintPDF() {
     window.print()
+  }
+
+  function handleFileUpload(e) {
+    e.preventDefault()
+    setIsDragging(false)
+    const file = e.dataTransfer ? e.dataTransfer.files[0] : e.target.files[0]
+    if (!file) return
+
+    const reader = new FileReader()
+    reader.onload = (event) => {
+      const text = event.target.result
+      // 쉼표, 탭, 줄바꿈 등으로 분리하여 숫자 추출
+      const numbers = text.split(/[\n\r,\t]+/)
+        .map(s => s.trim().replace(/['"원,]/g, ''))
+        .filter(s => s !== '' && !isNaN(Number(s)))
+        .map(Number)
+      
+      // 보통 발전량은 100 이상의 값이므로 연도나 작은 숫자를 거르고 추출
+      const validOutputs = numbers.filter(n => n > 100).slice(0, 12)
+      
+      if (validOutputs.length === 12) {
+        setInputForm(prev => ({ ...prev, monthlyOutput: validOutputs }))
+        alert('✅ 12개월 발전량 데이터가 성공적으로 불러와졌습니다.')
+      } else {
+        alert('❌ 파일에서 12개월 치 발전량 데이터를 찾지 못했습니다. 형식을 확인해주세요.')
+      }
+    }
+    reader.readAsText(file)
   }
 
   function handleDownloadCSV() {
@@ -168,16 +199,43 @@ export default function App() {
                     </select>
                   </div>
                 </div>
-                <div>
-                  <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--color-gray-500)', display: 'block', marginBottom: 12 }}>월별 실제 발전량 (kWh) — 전년도 기준</label>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 12 }}>
+                
+                <div style={{ marginTop: 24 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 12 }}>
+                    <label style={{ fontSize: 13, fontWeight: 700, color: 'var(--color-navy)', display: 'block' }}>월별 실제 발전량 (kWh) — 전년도 기준</label>
+                    <label style={{ fontSize: 12, color: 'var(--color-primary)', fontWeight: 600, cursor: 'pointer', background: 'var(--color-primary-light)', padding: '6px 12px', borderRadius: '4px' }}>
+                      📁 엑셀/CSV 데이터 파일 불러오기
+                      <input type="file" accept=".csv, .txt" onChange={handleFileUpload} style={{ display: 'none' }} />
+                    </label>
+                  </div>
+                  
+                  <div 
+                    onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                    onDragLeave={(e) => { e.preventDefault(); setIsDragging(false); }}
+                    onDrop={handleFileUpload}
+                    style={{ 
+                      display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 12, 
+                      padding: '20px', borderRadius: '8px', 
+                      background: isDragging ? 'rgba(37, 99, 235, 0.05)' : 'white',
+                      border: isDragging ? '2px dashed var(--color-primary)' : '1px solid var(--color-gray-200)',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    {isDragging && (
+                      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(255,255,255,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10, fontSize: 16, fontWeight: 700, color: 'var(--color-primary)' }}>
+                        이곳에 파일을 놓아주세요!
+                      </div>
+                    )}
                     {MONTHS.map((m, i) => (
-                      <div key={i}>
+                      <div key={i} style={{ position: 'relative', zIndex: 1 }}>
                         <label style={{ fontSize: 11, color: 'var(--color-gray-400)', display: 'block', marginBottom: 4 }}>{m}</label>
                         <input type="number" value={inputForm.monthlyOutput[i]} onChange={e => handleMonthlyChange(i, e.target.value)}
                           style={{ width: '100%', padding: '8px 10px', border: '1px solid var(--color-gray-200)', borderRadius: 'var(--radius-md)', fontSize: 13, boxSizing: 'border-box' }} required />
                       </div>
                     ))}
+                  </div>
+                  <div style={{ fontSize: 11, color: 'var(--color-gray-400)', marginTop: 8 }}>
+                    * 팁: 파일을 직접 드래그 앤 드롭해도 값이 자동으로 채워집니다.
                   </div>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, marginTop: 32 }}>
