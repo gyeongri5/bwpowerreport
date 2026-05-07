@@ -1,0 +1,286 @@
+
+<style>
+  * { box-sizing: border-box; }
+  .wrap { padding: 20px 0 8px; font-size: 14px; }
+  .tab-bar { display: flex; gap: 4px; margin-bottom: 20px; flex-wrap: wrap; }
+  .tab { padding: 7px 16px; border-radius: 20px; font-size: 12px; font-weight: 500; cursor: pointer; background: var(--color-background-secondary); color: var(--color-text-secondary); border: 1px solid var(--color-border-tertiary); transition: all .15s; }
+  .tab.active { background: var(--color-text-primary); color: var(--color-background-primary); border-color: var(--color-text-primary); }
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* shared */
+  .section { margin-bottom: 20px; }
+  .label { font-size: 11px; font-weight: 500; letter-spacing: .07em; color: var(--color-text-tertiary); margin-bottom: 8px; text-transform: uppercase; }
+  .card { background: var(--color-background-secondary); border: 1px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 14px 18px; margin-bottom: 10px; }
+  .card-title { font-size: 13px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 4px; }
+  .card-desc { font-size: 13px; color: var(--color-text-secondary); line-height: 1.65; }
+  .tag { font-size: 11px; padding: 2px 8px; border-radius: 12px; display: inline-block; margin: 2px 2px 2px 0; }
+  .tag-blue { background: #E6F1FB; color: #0C447C; }
+  .tag-green { background: #EAF3DE; color: #27500A; }
+  .tag-amber { background: #FAEEDA; color: #633806; }
+  .tag-purple { background: #EEEDFE; color: #3C3489; }
+  .tag-gray { background: var(--color-background-primary); color: var(--color-text-secondary); border: 1px solid var(--color-border-tertiary); }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .step-num { font-size: 11px; font-weight: 500; color: var(--color-text-tertiary); margin-bottom: 3px; }
+  .highlight-box { border-left: 3px solid #185FA5; background: #E6F1FB; border-radius: 0 8px 8px 0; padding: 12px 16px; margin-bottom: 10px; }
+  .highlight-box .ht { font-size: 13px; font-weight: 500; color: #0C447C; margin-bottom: 3px; }
+  .highlight-box .hd { font-size: 13px; color: #185FA5; line-height: 1.6; }
+  .formula-box { background: var(--color-background-primary); border: 1px solid var(--color-border-secondary); border-radius: 8px; padding: 12px 16px; font-family: var(--font-mono); font-size: 12px; color: var(--color-text-primary); margin: 8px 0; line-height: 1.8; }
+  .api-row { display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--color-border-tertiary); }
+  .api-row:last-child { border-bottom: none; }
+  .api-badge { font-size: 10px; font-weight: 500; padding: 3px 8px; border-radius: 4px; white-space: nowrap; margin-top: 1px; }
+  .api-info { flex: 1; }
+  .api-name { font-size: 13px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 2px; }
+  .api-desc { font-size: 12px; color: var(--color-text-secondary); line-height: 1.55; }
+  .warn { background: #FAEEDA; border-radius: 8px; padding: 10px 14px; font-size: 12px; color: #633806; margin-top: 6px; line-height: 1.6; }
+  hr { border: none; border-top: 1px solid var(--color-border-tertiary); margin: 16px 0; }
+  .stack-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .stack-card { background: var(--color-background-secondary); border: 1px solid var(--color-border-tertiary); border-radius: 10px; padding: 12px 14px; }
+  .stack-cat { font-size: 10px; font-weight: 500; color: var(--color-text-tertiary); margin-bottom: 4px; }
+  .stack-name { font-size: 13px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 3px; }
+  .stack-why { font-size: 11px; color: var(--color-text-secondary); line-height: 1.5; }
+  .timeline { position: relative; padding-left: 24px; }
+  .timeline::before { content:''; position:absolute; left:6px; top:6px; bottom:6px; width:1.5px; background: var(--color-border-secondary); }
+  .tl-item { position: relative; margin-bottom: 14px; }
+  .tl-dot { position: absolute; left: -22px; top: 3px; width: 10px; height: 10px; border-radius: 50%; background: var(--color-background-secondary); border: 2px solid var(--color-border-secondary); }
+  .tl-dot.done { background: #1D9E75; border-color: #1D9E75; }
+  .tl-day { font-size: 11px; font-weight: 500; color: var(--color-text-tertiary); margin-bottom: 2px; }
+  .tl-task { font-size: 13px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 2px; }
+  .tl-sub { font-size: 12px; color: var(--color-text-secondary); line-height: 1.5; }
+  .pitch-box { background: var(--color-background-secondary); border-radius: var(--border-radius-lg); padding: 16px 20px; border: 1px solid var(--color-border-tertiary); font-size: 13px; color: var(--color-text-secondary); line-height: 1.8; }
+  .pitch-box strong { color: var(--color-text-primary); font-weight: 500; }
+</style>
+
+<div class="wrap">
+  <div class="tab-bar">
+    <div class="tab active" onclick="show('concept')">① 핵심 로직</div>
+    <div class="tab" onclick="show('data')">② 데이터 API</div>
+    <div class="tab" onclick="show('stack')">③ 기술 스택</div>
+    <div class="tab" onclick="show('plan')">④ 구현 일정</div>
+    <div class="tab" onclick="show('pitch')">⑤ 발표 스크립트</div>
+  </div>
+
+  <!-- TAB 1: 핵심 로직 -->
+  <div id="panel-concept" class="panel active">
+    <div class="section">
+      <div class="label">핵심 계산 공식</div>
+      <div class="highlight-box">
+        <div class="ht">성능비 (PR, Performance Ratio) — 프로젝트의 핵심 지표</div>
+        <div class="hd">발전소가 이론상 낼 수 있는 발전량 대비 실제로 얼마나 냈는가를 보여주는 국제 표준 지표. 오솔라 앱에 이미 "발전 저하율"로 보여주는 바로 그 숫자의 원리입니다.</div>
+      </div>
+      <div class="formula-box">
+PR (%) = (실제 발전량 kWh) ÷ (이론 발전량 kWh) × 100
+
+이론 발전량 = 설비 용량(kW) × 일사량(kWh/m²) × 패널 효율(%)
+연간 손실액(원) = (1 - PR/100) × 연간 이론발전량 × SMP(원/kWh)
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="label">사용자 입력 → 출력 흐름</div>
+      <div class="card">
+        <div class="step-num">STEP 1 — 사용자 입력</div>
+        <div class="card-title">발전소 기본 정보</div>
+        <div class="card-desc">발전소 위치(시/도), 설치 용량(kW), 설치 연도, 최근 월별 실제 발전량(kWh) 직접 입력 또는 CSV 업로드</div>
+      </div>
+      <div class="card">
+        <div class="step-num">STEP 2 — 자동 계산</div>
+        <div class="card-title">이론 발전량 산출</div>
+        <div class="card-desc">기상청 ASOS API에서 해당 지역 월별 일사량 조회 → 이론 발전량 계산 → PR 산출 → 지역 평균 PR과 비교</div>
+      </div>
+      <div class="card">
+        <div class="step-num">STEP 3 — 진단 결과</div>
+        <div class="card-title">건강검진 리포트 출력</div>
+        <div class="card-desc">종합 점수(A~D 등급) / 연간 손실 금액 환산 / 지역 평균 대비 내 발전소 위치 / 권고 액션(점검·세척·부품 교체)</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="label">주요 화면 구성 (4개)</div>
+      <div class="row2">
+        <div class="card">
+          <div class="card-title">🏠 홈 대시보드</div>
+          <div class="card-desc">발전소 카드 목록, 각 발전소별 PR 게이지, 이상 감지 알림 배지</div>
+        </div>
+        <div class="card">
+          <div class="card-title">📊 성능 분석</div>
+          <div class="card-desc">12개월 실제 vs 이론 발전량 비교 차트, PR 추이, 지역 평균 비교선</div>
+        </div>
+        <div class="card">
+          <div class="card-title">💰 수익 손실 계산기</div>
+          <div class="card-desc">PR 저하로 인한 월별/연간 손실액, SMP 연동 실시간 환산</div>
+        </div>
+        <div class="card">
+          <div class="card-title">🩺 건강검진 리포트</div>
+          <div class="card-desc">A~D 등급 카드, 원인 진단, 권고 액션, PDF 저장(선택)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 2: 데이터 API -->
+  <div id="panel-data" class="panel">
+    <div class="section">
+      <div class="label">사용할 공개 API 3개</div>
+
+      <div class="card" style="padding: 6px 18px">
+        <div class="api-row">
+          <span class="api-badge tag-blue">공공데이터포털</span>
+          <div class="api-info">
+            <div class="api-name">기상청 지상(ASOS) 일자료 조회서비스</div>
+            <div class="api-desc">전국 주요 도시 일사량(MJ/m²) 데이터. 1904년~현재. 월별 평균값으로 "이론 발전량" 계산에 사용.</div>
+            <div style="margin-top:5px"><span class="tag tag-blue">data.go.kr 신청</span><span class="tag tag-gray">REST API / JSON</span><span class="tag tag-green">무료</span></div>
+          </div>
+        </div>
+        <div class="api-row">
+          <span class="api-badge tag-amber">KPX 전력거래소</span>
+          <div class="api-info">
+            <div class="api-name">한국전력거래소 계통한계가격(SMP) API</div>
+            <div class="api-desc">시간별 SMP(원/kWh) 실시간 조회. URL: openapi.kpx.or.kr. 손실 금액 환산에 사용.</div>
+            <div style="margin-top:5px"><span class="tag tag-amber">data.go.kr 신청</span><span class="tag tag-gray">REST API / JSON</span><span class="tag tag-green">무료</span></div>
+          </div>
+        </div>
+        <div class="api-row">
+          <span class="api-badge tag-purple">EPSIS</span>
+          <div class="api-info">
+            <div class="api-name">전력통계정보시스템(EPSIS) 지역별 발전 통계</div>
+            <div class="api-desc">지역·연도별 태양광 발전량 통계. "지역 평균 PR" 기준값 도출에 사용. CSV 직접 다운로드 가능.</div>
+            <div style="margin-top:5px"><span class="tag tag-purple">epsis.kpx.or.kr</span><span class="tag tag-gray">CSV 다운로드</span><span class="tag tag-green">무료</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="warn">⚠️ API 신청 유의사항: 기상청 ASOS API는 공공데이터포털(data.go.kr)에서 신청 후 승인까지 최소 1일 소요됩니다. <strong>면접 전날까지는 신청 완료</strong>해두세요. 데모 시 실제 API 연동이 안 되면 미리 뽑아둔 CSV 데이터로 대체해도 충분합니다.</div>
+    </div>
+
+    <div class="section">
+      <div class="label">API 없이도 가능한 대안 (데모용)</div>
+      <div class="card">
+        <div class="card-desc">기상청 기상자료개방포털(data.kma.go.kr)에서 지역별 월평균 일사량을 <strong>CSV로 직접 다운로드</strong>해서 프론트에 내장하면 API 키 없이도 정상 동작합니다. 면접 데모에서는 이 방식이 오히려 더 안정적입니다.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 3: 기술 스택 -->
+  <div id="panel-stack" class="panel">
+    <div class="section">
+      <div class="label">추천 기술 스택</div>
+      <div class="stack-grid">
+        <div class="stack-card">
+          <div class="stack-cat">프론트엔드</div>
+          <div class="stack-name">React + Vite</div>
+          <div class="stack-why">빠른 세팅, 컴포넌트 재사용, 오솔라 앱과 동일 생태계</div>
+        </div>
+        <div class="stack-card">
+          <div class="stack-cat">차트</div>
+          <div class="stack-name">Recharts</div>
+          <div class="stack-why">React 친화적, 발전량 시계열·비교 차트 구현이 빠름</div>
+        </div>
+        <div class="stack-card">
+          <div class="stack-cat">스타일링</div>
+          <div class="stack-name">Tailwind CSS</div>
+          <div class="stack-why">오솔라 앱 분위기(깔끔한 흰 배경) 빠르게 구현 가능</div>
+        </div>
+        <div class="stack-card">
+          <div class="stack-cat">API 연동</div>
+          <div class="stack-name">Axios / fetch</div>
+          <div class="stack-why">공공데이터포털 REST API 호출에 충분</div>
+        </div>
+        <div class="stack-card">
+          <div class="stack-cat">배포</div>
+          <div class="stack-name">Vercel</div>
+          <div class="stack-why">무료, git push 하나로 URL 즉시 공유 — 면접 데모에 최적</div>
+        </div>
+        <div class="stack-card">
+          <div class="stack-cat">백엔드(선택)</div>
+          <div class="stack-name">없어도 됨</div>
+          <div class="stack-why">공개 API는 프론트에서 직접 호출. 복잡도 낮추는 게 유리</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="label">오솔라 앱과 디자인 맞추는 팁</div>
+      <div class="card">
+        <div class="card-desc">오솔라 앱 색상은 <strong>흰 배경 / 진한 네이비 텍스트 / 포인트 파란색(#1A56DB 계열)</strong>입니다. Tailwind의 <code>blue-600</code>, <code>slate-900</code>으로 빠르게 맞출 수 있어요. 앱 캡처 이미지의 카드 UI를 참고해서 "발전소 카드" 컴포넌트를 만들면 면접관이 친숙함을 느낍니다.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 4: 구현 일정 -->
+  <div id="panel-plan" class="panel">
+    <div class="section">
+      <div class="label">면접까지 5일 기준 타임라인</div>
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-dot done"></div>
+          <div class="tl-day">Day 1</div>
+          <div class="tl-task">데이터 수집 + 계산 로직 검증</div>
+          <div class="tl-sub">기상청 ASOS API 신청 / 일사량 CSV 다운로드 / PR 계산 공식 엑셀로 먼저 검증 / SMP 데이터 확보</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <div class="tl-day">Day 2</div>
+          <div class="tl-task">React 프로젝트 세팅 + 발전소 입력 폼</div>
+          <div class="tl-sub">Vite + Tailwind 세팅 / 발전소 정보 입력 UI / PR 계산 함수 구현 / 결과 카드 컴포넌트</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <div class="tl-day">Day 3</div>
+          <div class="tl-task">차트 + 손실 금액 계산기</div>
+          <div class="tl-sub">Recharts로 12개월 실제 vs 이론 발전량 비교 차트 / SMP 연동 손실액 계산 / 지역 평균 비교선 추가</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <div class="tl-day">Day 4</div>
+          <div class="tl-task">건강검진 리포트 + 등급 판정 로직</div>
+          <div class="tl-sub">A~D 등급 알고리즘 / 권고 액션 카드 / 전체 UI 다듬기 / Vercel 배포</div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot"></div>
+          <div class="tl-day">Day 5</div>
+          <div class="tl-task">데모 시나리오 준비 + 발표 연습</div>
+          <div class="tl-sub">실제 발전소 데이터로 시연 시나리오 구성 / "왜 이렇게 만들었나" 설명 스크립트 작성 / 예상 질문 답변 준비</div>
+        </div>
+      </div>
+    </div>
+    <div class="warn" style="background:#EAF3DE; color:#27500A;">✅ 30분 데모 기준 최소 완성 범위: Day 1~3만 해도 충분히 동작하는 데모가 나옵니다. Day 4~5는 완성도 플러스입니다.</div>
+  </div>
+
+  <!-- TAB 5: 발표 스크립트 -->
+  <div id="panel-pitch" class="panel">
+    <div class="section">
+      <div class="label">10~15분 설명 스크립트 (권장 흐름)</div>
+
+      <div class="card">
+        <div class="step-num">OPEN (1분)</div>
+        <div class="card-title">문제 정의</div>
+        <div class="card-desc">"오솔라 앱에는 발전 저하율이 13.4%라고 나옵니다. 그런데 사용자 입장에서 이게 많은 건지, 얼마나 손해보고 있는 건지 알 수 없습니다. 저는 이 숫자를 돈으로 번역하고, 무엇을 해야 하는지까지 알려주는 도구를 만들었습니다."</div>
+      </div>
+      <div class="card">
+        <div class="step-num">BODY 1 (3분)</div>
+        <div class="card-title">데이터 접근 방식 설명</div>
+        <div class="card-desc">"기상청 ASOS API로 지역별 일사량을, KPX에서 SMP 가격을 가져와서 '이론상 얼마를 발전해야 하는가'를 계산하고, 실제 발전량과 비교했습니다. 이 방식은 태양광 업계의 국제 표준 지표인 PR(성능비)을 기반으로 합니다."</div>
+      </div>
+      <div class="card">
+        <div class="step-num">BODY 2 (5분)</div>
+        <div class="card-title">데모 시연</div>
+        <div class="card-desc">실제 발전소 데이터 입력 → PR 산출 → 손실액 확인 → 건강검진 등급 카드 → 권고 액션 순서로 시연. "이 발전소는 지역 평균보다 PR이 8% 낮고, 연간 약 120만원의 손실이 발생하고 있습니다."</div>
+      </div>
+      <div class="card">
+        <div class="step-num">CLOSE (2분)</div>
+        <div class="card-title">오솔라 로드맵과의 연결</div>
+        <div class="card-desc">"오솔라가 3분기에 출시할 모니터링 기능과, 삼일PwC와의 협업에서 목표로 하는 '재무와 발전 데이터 결합'이 바로 이 방향입니다. 이 프로토타입은 그 다음 레이어의 첫 번째 화면이 될 수 있다고 생각합니다."</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function show(tab) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + tab).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>

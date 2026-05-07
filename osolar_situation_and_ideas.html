@@ -1,0 +1,153 @@
+
+<style>
+  .section-label { font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-text-tertiary); margin-bottom: 8px; }
+  .card { background: var(--color-background-secondary); border: 1px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 16px 20px; margin-bottom: 10px; }
+  .card-row { display: flex; gap: 10px; margin-bottom: 10px; }
+  .tag { font-size: 11px; font-weight: 500; padding: 3px 9px; border-radius: 20px; display: inline-block; }
+  .tag-done { background: #EAF3DE; color: #27500A; }
+  .tag-wip  { background: #FAEEDA; color: #633806; }
+  .tag-next { background: #E6F1FB; color: #0C447C; }
+  .idea-card { background: var(--color-background-secondary); border-radius: var(--border-radius-lg); overflow: hidden; margin-bottom: 12px; border: 1px solid var(--color-border-tertiary); cursor: pointer; transition: border-color .15s; }
+  .idea-card:hover { border-color: var(--color-border-secondary); }
+  .idea-header { padding: 14px 20px 10px; border-bottom: 1px solid var(--color-border-tertiary); }
+  .idea-num { font-size: 11px; font-weight: 500; color: var(--color-text-tertiary); margin-bottom: 4px; }
+  .idea-title { font-size: 15px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 2px; }
+  .idea-sub { font-size: 13px; color: var(--color-text-secondary); }
+  .idea-body { padding: 12px 20px 14px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .idea-col-label { font-size: 11px; font-weight: 500; color: var(--color-text-tertiary); margin-bottom: 5px; }
+  .idea-col-val { font-size: 13px; color: var(--color-text-primary); line-height: 1.6; }
+  .pitch { font-size: 13px; color: var(--color-text-secondary); font-style: italic; border-left: 2px solid var(--color-border-secondary); padding-left: 12px; margin: 12px 20px 14px; line-height: 1.6; }
+  .divider { border: none; border-top: 1px solid var(--color-border-tertiary); margin: 16px 0; }
+  .badge-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .badge { font-size: 11px; padding: 2px 8px; border-radius: 20px; background: var(--color-background-primary); border: 1px solid var(--color-border-tertiary); color: var(--color-text-secondary); }
+  .star { color: #BA7517; }
+</style>
+
+<div style="padding: 20px 0 4px">
+  <div class="section-label">오솔라 현황 요약</div>
+
+  <div class="card">
+    <div style="font-size:13px; font-weight:500; color:var(--color-text-primary); margin-bottom:10px">완성된 기능 (이미 있음)</div>
+    <div class="badge-row">
+      <span class="tag tag-done">✓ 세무·기장 자동화</span>
+      <span class="tag tag-done">✓ 청구 자동화 (14개 시스템)</span>
+      <span class="tag tag-done">✓ REC 발급·현물거래 HTS</span>
+      <span class="tag tag-done">✓ 발전량 대시보드</span>
+      <span class="tag tag-done">✓ 발전소 통합관리 (100개)</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div style="font-size:13px; font-weight:500; color:var(--color-text-primary); margin-bottom:10px">지금 개발 중 / 곧 필요한 것</div>
+    <div class="badge-row">
+      <span class="tag tag-wip">⏳ 실시간 모니터링 (25년 3Q 예정)</span>
+      <span class="tag tag-next">→ 발전소 성능 이상 감지</span>
+      <span class="tag tag-next">→ VPP 연계 (해줌 MOU)</span>
+      <span class="tag tag-next">→ 스트링·패널 레벨 효율 분석 (삼일PwC MOU)</span>
+      <span class="tag tag-next">→ 리파워링·보험 자산관리</span>
+    </div>
+  </div>
+
+  <div class="card" style="background: var(--color-background-primary); border-color: var(--color-border-secondary);">
+    <div style="font-size:13px; line-height:1.7; color:var(--color-text-secondary)">
+      <span style="color:var(--color-text-primary); font-weight:500">결론:</span>
+      세무·정산은 졸업했고, 지금 바이트웍스는 <span style="color:var(--color-text-primary)">"발전소 데이터 → 운영 최적화 → 수익 극대화"</span> 파이프라인을 만드는 단계입니다.
+      인턴에게 원하는 것은 <span style="color:var(--color-text-primary)">그 파이프라인의 초석이 될 아이디어와 실제로 동작하는 프로토타입</span>입니다.
+    </div>
+  </div>
+
+  <hr class="divider">
+  <div class="section-label" style="margin-top:16px">추천 아이디어 3개</div>
+
+  <!-- Idea 1 -->
+  <div class="idea-card" onclick="sendPrompt('아이디어 1번 발전소 건강검진 대시보드로 프로젝트 시작하고 싶어. 구체적인 구현 방법과 사용할 데이터 API, 기술 스택을 알려줘')">
+    <div class="idea-header">
+      <div class="idea-num">아이디어 01 &nbsp;<span class="star">★ 1순위 추천</span></div>
+      <div class="idea-title">발전소 건강검진 대시보드</div>
+      <div class="idea-sub">모니터링 + 성능 이상 감지 + 수익 손실 금액 환산</div>
+    </div>
+    <div class="pitch">
+      "오솔라가 3분기에 출시할 모니터링 기능의 다음 레이어입니다. 단순히 kW를 보여주는 게 아니라, 저하율을 돈으로 번역하고 행동 지침을 줍니다."
+    </div>
+    <div class="idea-body">
+      <div>
+        <div class="idea-col-label">왜 지금인가</div>
+        <div class="idea-col-val">웹사이트에 모니터링이 "3Q 예정"으로 명시. 삼일PwC MOU의 핵심 키워드가 "스트링·패널 레벨 정밀 효율 관리"</div>
+      </div>
+      <div>
+        <div class="idea-col-label">구현 내용</div>
+        <div class="idea-col-val">위치·용량 입력 → 기상청 일사량 API로 이론 발전량 계산 → 실제 대비 성능비(PR) → 연간 손실액 환산 → 점검 권고 카드</div>
+      </div>
+    </div>
+    <div style="padding: 0 20px 14px">
+      <div class="badge-row">
+        <span class="badge">기상청 일사량 API</span>
+        <span class="badge">한국에너지공단 EPSIS</span>
+        <span class="badge">KPX SMP 공시가</span>
+        <span class="badge">React 대시보드</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Idea 2 -->
+  <div class="idea-card" onclick="sendPrompt('아이디어 2번 VPP 수익 시뮬레이터로 프로젝트 시작하고 싶어. 구체적인 구현 방법과 사용할 데이터 API, 기술 스택을 알려줘')">
+    <div class="idea-header">
+      <div class="idea-num">아이디어 02</div>
+      <div class="idea-title">VPP 수익 시뮬레이터</div>
+      <div class="idea-sub">소규모 발전소가 VPP에 참여했을 때 추가 수익 계산기</div>
+    </div>
+    <div class="pitch">
+      "해줌과의 MOU가 실제 서비스로 이어지려면 사용자가 '나는 VPP에 참여하면 얼마 더 버나?'를 바로 알 수 있어야 합니다. 그 판단 도구를 만들었습니다."
+    </div>
+    <div class="idea-body">
+      <div>
+        <div class="idea-col-label">왜 지금인가</div>
+        <div class="idea-col-val">해줌 MOU 체결(2025.09). VPP 연계는 오솔라의 다음 수익 모델이자 사용자 유입 허들을 낮추는 도구</div>
+      </div>
+      <div>
+        <div class="idea-col-label">구현 내용</div>
+        <div class="idea-col-val">발전소 용량·위치 입력 → 현재 SMP 수익 계산 → VPP DR 참여 시 추가 정산금 추정 → 월별 수익 비교 차트</div>
+      </div>
+    </div>
+    <div style="padding: 0 20px 14px">
+      <div class="badge-row">
+        <span class="badge">KPX DR 정산 공개 데이터</span>
+        <span class="badge">SMP 시계열</span>
+        <span class="badge">Chart.js</span>
+        <span class="badge">시뮬레이션 UI</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Idea 3 -->
+  <div class="idea-card" onclick="sendPrompt('아이디어 3번 리파워링 투자회수 계산기로 프로젝트 시작하고 싶어. 구체적인 구현 방법과 사용할 데이터 API, 기술 스택을 알려줘')">
+    <div class="idea-header">
+      <div class="idea-num">아이디어 03</div>
+      <div class="idea-title">리파워링 투자회수 계산기</div>
+      <div class="idea-sub">설비 노후화 → 교체 시 ROI 분석 + 금융상품 연계 UI</div>
+    </div>
+    <div class="pitch">
+      "오솔라가 축적한 발전 데이터를 보험·리파워링 투자 연계로 확장하는 첫 번째 핀테크 기능입니다. 숫자를 금융 의사결정으로 연결합니다."
+    </div>
+    <div class="idea-body">
+      <div>
+        <div class="idea-col-label">왜 지금인가</div>
+        <div class="idea-col-val">창업자가 직접 언급한 "보험·리파워링 투자 연계"가 아직 구현 안 됨. 핀테크 확장의 구체적 첫 단계</div>
+      </div>
+      <div>
+        <div class="idea-col-label">구현 내용</div>
+        <div class="idea-col-val">설치연도·현재 발전량 입력 → 패널 열화율 적용 → 리파워링 비용 대비 회수기간 계산 → "지금 교체 vs 3년 후" 비교 카드</div>
+      </div>
+    </div>
+    <div style="padding: 0 20px 14px">
+      <div class="badge-row">
+        <span class="badge">패널 열화율 공개 데이터</span>
+        <span class="badge">EPSIS 발전량 통계</span>
+        <span class="badge">ROI 계산 로직</span>
+        <span class="badge">금융 연계 와이어프레임</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="font-size:12px; color:var(--color-text-tertiary); margin-top:4px; text-align:center">각 카드를 클릭하면 해당 아이디어의 구체적 구현 방법을 안내해드립니다</div>
+</div>

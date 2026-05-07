@@ -1,0 +1,16 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/kma/:match*",
+      "destination": "http://apis.data.go.kr/:match*"
+    },
+    {
+      "source": "/api/kpx/:match*",
+      "destination": "https://openapi.kpx.or.kr/:match*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

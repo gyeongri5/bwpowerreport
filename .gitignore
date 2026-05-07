@@ -1,0 +1,22 @@
+# 의존성
+node_modules/
+dist/
+dist-ssr/
+
+# =============================================
+# ⚠️  API 키 보안 — 절대 깃허브에 올리지 마세요
+# =============================================
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+
+# 로컬 개발 환경
+*.local
+.DS_Store
+Thumbs.db
+
+# 빌드 캐시
+.vite/
+*.log
