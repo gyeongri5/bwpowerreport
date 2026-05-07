@@ -65,11 +65,13 @@ export function getDaysInMonth(year, month) {
 /**
  * 발전소 전체 분석 실행
  */
-export function analyzePlant(plant, radiationData, smpPrice) {
+export function analyzePlant(plant, radiationData, smpData) {
   const year = new Date().getFullYear() - 1 // 전년도 기준
   const monthlyResults = []
   let totalActual = 0
   let totalTheoretical = 0
+  let totalLossKwh = 0
+  let totalLossAmount = 0
 
   radiationData.forEach(({ month, radiation }) => {
     const days = getDaysInMonth(year, month)
@@ -77,13 +79,31 @@ export function analyzePlant(plant, radiationData, smpPrice) {
     const actual = plant.monthlyOutput[month - 1] || 0
     const pr = calcPR(actual, theoretical)
 
-    monthlyResults.push({ month, actual, theoretical: parseFloat(theoretical.toFixed(0)), pr })
+    // 해당 월의 SMP 적용
+    const monthKey = `${year}-${String(month).padStart(2, '0')}`
+    const monthlySmp = (smpData.allData && smpData.allData[monthKey]) ? smpData.allData[monthKey] : smpData.smp
+    
+    // 월별 손실량 및 금액 계산
+    const lossKwh = Math.max(0, theoretical - actual)
+    const monthlyLoss = lossKwh * monthlySmp
+
+    monthlyResults.push({ 
+      month, 
+      actual, 
+      theoretical: parseFloat(theoretical.toFixed(0)), 
+      pr,
+      lossKwh: parseFloat(lossKwh.toFixed(0)),
+      lossAmount: parseFloat(monthlyLoss.toFixed(0)),
+      smpApplied: monthlySmp
+    })
+    
     totalActual += actual
     totalTheoretical += theoretical
+    totalLossKwh += lossKwh
+    totalLossAmount += monthlyLoss
   })
 
   const annualPR = calcPR(totalActual, totalTheoretical)
-  const { lossKwh, lossAmount } = calcAnnualLoss(totalTheoretical, totalActual, smpPrice)
   const grade = gradeFromPR(annualPR)
 
   return {
@@ -91,8 +111,8 @@ export function analyzePlant(plant, radiationData, smpPrice) {
     annualPR,
     totalActual: parseFloat(totalActual.toFixed(0)),
     totalTheoretical: parseFloat(totalTheoretical.toFixed(0)),
-    lossKwh,
-    lossAmount,
+    lossKwh: parseFloat(totalLossKwh.toFixed(0)),
+    lossAmount: parseFloat(totalLossAmount.toFixed(0)),
     grade,
     age: Math.max(0, new Date().getFullYear() - plant.installYear),
     degradationApplied: parseFloat((Math.max(0, new Date().getFullYear() - plant.installYear) * 0.5).toFixed(1))

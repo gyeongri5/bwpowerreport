@@ -123,6 +123,7 @@ export async function fetchCurrentSMP() {
     smp,
     source: 'csv',
     period: latestKey,
+    allData: SMP_CSV_DATA,
   }
 }
 

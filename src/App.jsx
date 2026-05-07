@@ -56,7 +56,7 @@ export default function App() {
       fetchCurrentSMP(),
     ])
     setSmpInfo(smp)
-    const result = analyzePlant(p, radiation, smp.smp)
+    const result = analyzePlant(p, radiation, smp)
     setAnalysis(result)
     setLoading(false)
   }
@@ -283,7 +283,7 @@ export default function App() {
                   <ResponsiveContainer width="100%" height={280}>
                     <BarChart data={analysis.monthlyResults.map((d, i) => ({
                       name: MONTHS[i],
-                      손실액: parseFloat(((d.theoretical - d.actual) * smpInfo.smp / 10000).toFixed(1))
+                      손실액: parseFloat((d.lossAmount / 10000).toFixed(1))
                     }))}>
                       <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-gray-100)" />
                       <XAxis dataKey="name" tick={{ fontSize: 12, fill: 'var(--color-gray-500)' }} axisLine={false} tickLine={false} />
@@ -399,7 +399,7 @@ export default function App() {
                     </div>
                     {analysis.lossAmount >= 500000 && (
                       <button className="btn-primary no-print" style={{ width: '100%', justifyContent: 'center', padding: '12px', fontSize: 15 }}>
-                        오솔라 정밀 세척/점검 솔루션 신청하기 →
+                        전문가 정밀 점검/세척 권장 (비용 회수 시뮬레이션) →
                       </button>
                     )}
                   </div>
@@ -415,6 +415,10 @@ export default function App() {
           </div>
         )}
       </main>
+
+      <footer className="no-print" style={{ textAlign: 'center', padding: '24px', color: 'var(--color-gray-400)', fontSize: 12 }}>
+        데이터 출처: 기상청(KMA) ASOS 종관기상관측, 한국전력거래소(KPX) 육지 계통한계가격(SMP)
+      </footer>
     </div>
   )
 }
